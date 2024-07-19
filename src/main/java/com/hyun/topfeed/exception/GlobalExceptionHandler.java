@@ -53,16 +53,6 @@ public class GlobalExceptionHandler {
     return ApiStandardResponse.fail(errorResponse);
   }
 
-  // 이미 동록된 이메일의 경우
-  @ExceptionHandler(AlreadyExistException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ApiStandardResponse<ErrorResponse> handleAlreadyExistException(AlreadyExistException e) {
-    log.error("", e);
-
-    final ErrorResponse errorResponse = ErrorResponse.create(e.toErrorCode(), e.getMessage());
-    return ApiStandardResponse.fail(errorResponse);
-  }
-
   // 인증 오류
   @ExceptionHandler(UnauthorizedException.class)
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
