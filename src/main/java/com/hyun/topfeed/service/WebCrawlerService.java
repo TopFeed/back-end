@@ -14,6 +14,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +38,7 @@ public class WebCrawlerService {
   private final FeedJpaRepository feedJpaRepository;
   private final MessageService messageService;
 
-  // @Scheduled(cron = "0 0 9-21/3 * * *", zone = "Asia/Seoul") // 9시부터 9시까지 3시간 간격으로 실행
+  @Scheduled(cron = "0 0 9-21/3 * * *", zone = "Asia/Seoul") // 9시부터 9시까지 3시간 간격으로 실행
   public void crawler() {
     ZoneId koreaZoneId = ZoneId.of("Asia/Seoul"); // 대한민국 시간대
     ZonedDateTime dateTime = ZonedDateTime.now(koreaZoneId);
