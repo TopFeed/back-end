@@ -4,6 +4,7 @@ import com.hyun.topfeed.entity.Feed;
 import com.hyun.topfeed.entity.User;
 import com.hyun.topfeed.repository.FeedJpaRepository;
 import com.hyun.topfeed.repository.UserJpaRepository;
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -38,7 +39,7 @@ public class WebCrawlerService {
   private final FeedJpaRepository feedJpaRepository;
   private final MessageService messageService;
 
-  @Scheduled(cron = "0 0 9-21/3 * * *", zone = "Asia/Seoul") // 9시부터 9시까지 3시간 간격으로 실행
+  @Scheduled(cron = "0 0 9-21/3 * * *", zone = "Asia/Seoul") // 오전 9시부터 오후 9시까지 3시간 간격으로 실행
   public void crawler() {
     ZoneId koreaZoneId = ZoneId.of("Asia/Seoul"); // 대한민국 시간대
     ZonedDateTime dateTime = ZonedDateTime.now(koreaZoneId);
@@ -164,16 +165,13 @@ public class WebCrawlerService {
           break;
         }
 
-        Element rankElement = element.selectFirst("div.rankNum span.no1 span");
-        if (rankElement != null) {
-          Element titleElement = element.selectFirst("h2 a");
-          if (titleElement != null) {
-            String title = titleElement.attr("title");
-            String url = "https://pann.nate.com" + titleElement.attr("href");
+        Element titleElement = element.selectFirst("h2 a");
+        if (titleElement != null) {
+          String title = titleElement.attr("title");
+          String url = "https://pann.nate.com" + titleElement.attr("href");
 
-            Feed feed = Feed.createFeed(title, url, "nate");
-            feedJpaRepository.save(feed);
-          }
+          Feed feed = Feed.createFeed(title, url, "nate");
+          feedJpaRepository.save(feed);
           count++;
         }
       }
