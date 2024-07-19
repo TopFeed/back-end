@@ -1,18 +1,19 @@
 package com.hyun.topfeed.exception;
 
-import static com.hyunn.nobody.exception.ErrorStatus.INVALID_JSON_EXCEPTION;
-import static com.hyunn.nobody.exception.ErrorStatus.INVALID_PARAMETER;
-import static com.hyunn.nobody.exception.ErrorStatus.MEDIA_TYPE_NOT_SUPPORTED_EXCEPTION;
-import static com.hyunn.nobody.exception.ErrorStatus.NEED_MORE_PARAMETER;
-import static com.hyunn.nobody.exception.ErrorStatus.VALIDATION_EXCEPTION;
+import static com.hyun.topfeed.exception.ErrorStatus.INVALID_JSON_EXCEPTION;
+import static com.hyun.topfeed.exception.ErrorStatus.INVALID_PARAMETER;
+import static com.hyun.topfeed.exception.ErrorStatus.MEDIA_TYPE_NOT_SUPPORTED_EXCEPTION;
+import static com.hyun.topfeed.exception.ErrorStatus.NEED_MORE_PARAMETER;
+import static com.hyun.topfeed.exception.ErrorStatus.VALIDATION_EXCEPTION;
 
-import com.hyunn.nobody.dto.ApiStandardResponse;
-import com.hyunn.nobody.dto.ErrorResponse;
+import com.hyun.topfeed.dto.ApiStandardResponse;
+import com.hyun.topfeed.dto.ErrorResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpServerErrorException.InternalServerError;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @Slf4j
@@ -35,6 +37,36 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   public ApiStandardResponse<ErrorResponse> handleApiKeyNotValidException(
       ApiKeyNotValidException e) {
+    log.error("", e);
+
+    final ErrorResponse errorResponse = ErrorResponse.create(e.toErrorCode(), e.getMessage());
+    return ApiStandardResponse.fail(errorResponse);
+  }
+
+  // 유저를 찾을 수 없는 경우
+  @ExceptionHandler(UserNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ApiStandardResponse<ErrorResponse> handleUserNotFoundException(UserNotFoundException e) {
+    log.error("", e);
+
+    final ErrorResponse errorResponse = ErrorResponse.create(e.toErrorCode(), e.getMessage());
+    return ApiStandardResponse.fail(errorResponse);
+  }
+
+  // 이미 동록된 이메일의 경우
+  @ExceptionHandler(AlreadyExistException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ApiStandardResponse<ErrorResponse> handleAlreadyExistException(AlreadyExistException e) {
+    log.error("", e);
+
+    final ErrorResponse errorResponse = ErrorResponse.create(e.toErrorCode(), e.getMessage());
+    return ApiStandardResponse.fail(errorResponse);
+  }
+
+  // 인증 오류
+  @ExceptionHandler(UnauthorizedException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public ApiStandardResponse<ErrorResponse> handleUnauthorizedException(UnauthorizedException e) {
     log.error("", e);
 
     final ErrorResponse errorResponse = ErrorResponse.create(e.toErrorCode(), e.getMessage());
@@ -144,27 +176,26 @@ public class GlobalExceptionHandler {
     return ApiStandardResponse.fail(errorResponse);
   }
 
-//  // 데이터 베이스 오류
-//  @ExceptionHandler(DataAccessException.class)
-//  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//  public ApiStandardResponse<ErrorResponse> handleDataAccessException(DataAccessException e) {
-//    log.error("", e);
-//
-//    final ErrorResponse errorResponse = ErrorResponse.create(ErrorStatus.DATABASE_ERROR,
-//        "데이터베이스에 오류가 발생했습니다.");
-//    return ApiStandardResponse.fail(errorResponse);
-//  }
-//
-//  // 내부 서버 오류
-//  @ExceptionHandler(InternalServerError.class)
-//  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//  public ApiStandardResponse<ErrorResponse> handleInternalServerError(InternalServerError e) {
-//    log.error("", e);
-//
-//    final ErrorResponse errorResponse = ErrorResponse.create(ErrorStatus.INTERNAL_SERVER_ERROR,
-//        "예상치 못한 오류가 발생했습니다. 관리자에게 문의해주세요.");
-//    return ApiStandardResponse.fail(errorResponse);
-//  }
-}
+  // 데이터 베이스 오류
+  @ExceptionHandler(DataAccessException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ApiStandardResponse<ErrorResponse> handleDataAccessException(DataAccessException e) {
+    log.error("", e);
 
+    final ErrorResponse errorResponse = ErrorResponse.create(ErrorStatus.DATABASE_ERROR,
+        "데이터베이스에 오류가 발생했습니다.");
+    return ApiStandardResponse.fail(errorResponse);
+  }
+
+  // 내부 서버 오류
+  @ExceptionHandler(InternalServerError.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ApiStandardResponse<ErrorResponse> handleInternalServerError(InternalServerError e) {
+    log.error("", e);
+
+    final ErrorResponse errorResponse = ErrorResponse.create(ErrorStatus.INTERNAL_SERVER_ERROR,
+        "예상치 못한 오류가 발생했습니다. 관리자에게 문의해주세요.");
+    return ApiStandardResponse.fail(errorResponse);
+  }
+}
 

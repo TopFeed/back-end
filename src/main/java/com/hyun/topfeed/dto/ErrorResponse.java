@@ -1,6 +1,6 @@
 package com.hyun.topfeed.dto;
 
-import com.hyunn.nobody.exception.ErrorStatus;
+import com.hyun.topfeed.exception.ErrorStatus;
 import lombok.Getter;
 
 @Getter
