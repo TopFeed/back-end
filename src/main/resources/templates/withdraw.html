@@ -138,7 +138,7 @@
       timerInterval = setInterval(updateTimer, 1000);
       updateTimer();
 
-      fetch(`https://topfeed.hyun.site/api/user/code?email=${email}`, {
+      fetch(`https://topfeed.hyunn.site/api/user/code?email=${email}`, {
         method: 'POST',
         headers: {
           'x-api-key' : apiKey
@@ -169,7 +169,7 @@
       const email = emailInput.value.trim();
       const code = codeInput.value.trim();
 
-      fetch(`https://topfeed.hyun.site/api/user/authentication?email=${email}&code=${code}`, {
+      fetch(`https://topfeed.hyunn.site/api/user/authentication?email=${email}&code=${code}`, {
         method: 'POST',
         headers: {
           'x-api-key' : apiKey
@@ -208,7 +208,7 @@
 
       const confirmation = confirm('정말 서비스 이용을 중지하시겠습니까?');
       if (confirmation) {
-        fetch(`https://topfeed.hyun.site/api/user?email=${email}`, {
+        fetch(`https://topfeed.hyunn.site/api/user?email=${email}`, {
           method: 'DELETE',
           headers: {
             'x-api-key' : apiKey
@@ -219,7 +219,7 @@
         }).then(data => {
           if (data.code == "00") {
             alert(data.data);
-            window.location.href = 'https://topfeed.hyun.site';
+            window.location.href = 'https://topfeed.hyunn.site';
           } else {
             alert(data.data.msg);
           }
