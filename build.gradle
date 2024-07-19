@@ -18,9 +18,29 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
+	// 기본 구성
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.jetbrains:annotations:24.0.0'
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// validation 의존성
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// jsoup 의존성
+	implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.3'
+
+	// json 의존성
+	implementation 'com.google.code.gson:gson:2.8.8'
+
+	// mail 의존성
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	// timeLeaf 의존성
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 }
 
 tasks.named('test') {
