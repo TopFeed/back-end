@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -41,7 +40,7 @@ public class MessageService {
     simpleMailMessage.setSubject(title);
 
     // 내용
-    message += "자세한 내용은 사이트에서 확인해주세요!\nhttps://www.catholic.ac.kr/index.do"; // 링크 수정
+    message += "자세한 내용은 사이트에서 확인해주세요!\nhttps://topfeed.hyunn.site"; // 링크 수정
     simpleMailMessage.setText(message);
 
     try {
@@ -56,7 +55,7 @@ public class MessageService {
    * 메세지 발송에 대한 응답 취합
    */
   public void sendMessage(String email) {
-    List<String> communityList = List.of(new String[]{"디시인사이드", "에펨코리아", "네이트판", "더쿠"});
+    List<String> communityList = List.of(new String[]{"dcinside", "fmkorea", "nate", "theqoo"});
 
     // 메세지 만들기
     String message = "";
@@ -74,7 +73,7 @@ public class MessageService {
    */
   public String makeMessage(String community) {
     String message = "";
-    List<Feed> feeds = feedJpaRepository.findTop3ByCommunity(community, PageRequest.of(0, 3));
+    List<Feed> feeds = feedJpaRepository.findAllByCommunity(community);
     message += "[" + community + "]\n";
     for (int i = 0; i < 3; i++) {
       message += feeds.get(i).getTitle() + "\n";
