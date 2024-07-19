@@ -8,8 +8,11 @@ import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -38,6 +41,20 @@ public class WebCrawlerService {
   private final UserJpaRepository userJpaRepository;
   private final FeedJpaRepository feedJpaRepository;
   private final MessageService messageService;
+
+  private static final List<String> USER_AGENTS = Arrays.asList(
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.1 Safari/605.1.15",
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36",
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36",
+      "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0"
+  );
+
+  private static final Random RANDOM = new Random();
+
+  private String getRandomUserAgent() {
+    return USER_AGENTS.get(RANDOM.nextInt(USER_AGENTS.size()));
+  }
 
   @Scheduled(cron = "0 0 9-21/3 * * *", zone = "Asia/Seoul") // 오전 9시부터 오후 9시까지 3시간 간격으로 실행
   public void crawler() {
@@ -89,8 +106,8 @@ public class WebCrawlerService {
     // Jsoup을 활용한 크롤링 설정
     try {
       Document doc = Jsoup.connect(dcinsideLink)
-          .userAgent(
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
+          .userAgent(getRandomUserAgent())
+          .timeout(5000)
           .get();
       feedJpaRepository.deleteFeedsByCommunity("dcinside");
 
@@ -108,7 +125,9 @@ public class WebCrawlerService {
         feedJpaRepository.save(feed);
         count++;
       }
-    } catch (Exception e) {
+    } catch (HttpStatusException e) {
+      System.err.println("HTTP error fetching URL. Status=" + e.getStatusCode() + ", URL=" + e.getUrl());
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
@@ -121,8 +140,8 @@ public class WebCrawlerService {
     // Jsoup을 활용한 크롤링 설정
     try {
       Document doc = Jsoup.connect(fmkoreaLink)
-          .userAgent(
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+          .userAgent(getRandomUserAgent())
+          .timeout(5000)
           .get();
       feedJpaRepository.deleteFeedsByCommunity("fmkorea");
 
@@ -140,7 +159,9 @@ public class WebCrawlerService {
         feedJpaRepository.save(feed);
         count++;
       }
-    } catch (Exception e) {
+    } catch (HttpStatusException e) {
+      System.err.println("HTTP error fetching URL. Status=" + e.getStatusCode() + ", URL=" + e.getUrl());
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
@@ -153,8 +174,8 @@ public class WebCrawlerService {
     // Jsoup을 활용한 크롤링 설정
     try {
       Document doc = Jsoup.connect(nateLink)
-          .userAgent(
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
+          .userAgent(getRandomUserAgent())
+          .timeout(5000)
           .get();
       feedJpaRepository.deleteFeedsByCommunity("nate");
 
@@ -176,7 +197,9 @@ public class WebCrawlerService {
           count++;
         }
       }
-    } catch (Exception e) {
+    } catch (HttpStatusException e) {
+      System.err.println("HTTP error fetching URL. Status=" + e.getStatusCode() + ", URL=" + e.getUrl());
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
@@ -189,8 +212,8 @@ public class WebCrawlerService {
     // Jsoup을 활용한 크롤링 설정
     try {
       Document doc = Jsoup.connect(theqooLink)
-          .userAgent(
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
+          .userAgent(getRandomUserAgent())
+          .timeout(5000)
           .get();
       feedJpaRepository.deleteFeedsByCommunity("theqoo");
 
@@ -214,7 +237,9 @@ public class WebCrawlerService {
           }
         }
       }
-    } catch (Exception e) {
+    } catch (HttpStatusException e) {
+      System.err.println("HTTP error fetching URL. Status=" + e.getStatusCode() + ", URL=" + e.getUrl());
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
