@@ -1,7 +1,6 @@
 package com.hyun.topfeed.service;
 
 import com.hyun.topfeed.entity.User;
-import com.hyun.topfeed.exception.AlreadyExistException;
 import com.hyun.topfeed.exception.ApiKeyNotValidException;
 import com.hyun.topfeed.exception.UnauthorizedException;
 import com.hyun.topfeed.exception.UserNotFoundException;

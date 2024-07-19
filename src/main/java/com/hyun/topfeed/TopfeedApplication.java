@@ -12,8 +12,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ServletComponentScan
 public class TopfeedApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(TopfeedApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(TopfeedApplication.class, args);
+  }
 
 }
