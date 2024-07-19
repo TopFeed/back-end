@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>이메일 알림 제거</title>
+  <link rel="icon" href="https://velog.velcdn.com/images/hyuntae99/post/a526a2a6-049f-44d9-a3a5-283ab944719b/image.png" type="image/png">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 75vh; margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #e0f7fa;
+      overflow: hidden; /* 물방울이 화면 밖으로 나가지 않도록 */
+      position: relative;
+    }
+
+    h1 {
+      font-size: 3rem;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 2rem;
+    }
+
+    .input {
+      margin-top: 1rem;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    button {
+      margin-top: 1rem;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 5px;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #3e8e41;
+    }
+
+    .drop {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(0, 150, 136, 0.5);
+      transform: scale(0);
+      animation: drop 0.6s linear;
+      pointer-events: none;
+    }
+
+    @keyframes drop {
+      to {
+        transform: scale(1);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+<h1>이메일 알림 제거</h1>
+<form id="emailForm">
+  <div class="button-container">
+    <input type="email" class="input" id="emailInput" placeholder="이메일 입력" required>
+    <button type="button" class="btn" id="authBtn">인증</button>
+    <div id="timerContainer" style="display: none;">
+      <span id="timer">3:00</span>
+    </div>
+  </div>
+  <div id="codeContainer" style="display: none;">
+    <input type="text" class="input" id="codeInput" placeholder="인증 번호 입력" maxlength="6" required>
+    <button type="button" class="btn" id="verifyBtn" style="margin-left: 5px;">확인</button>
+  </div>
+  <div class="button-container">
+    <div id="formContainer" style="display: none;">
+      <button type="button" class="btn" id="submitBtn">이메일 알림 제거</button>
+    </div>
+  </div>
+</form>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const authBtn = document.getElementById('authBtn');
+    const emailInput = document.getElementById('emailInput');
+    const timerContainer = document.getElementById('timerContainer');
+    const timer = document.getElementById('timer');
+    const codeContainer = document.getElementById('codeContainer');
+    const codeInput = document.getElementById('codeInput');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const formContainer = document.getElementById('formContainer');
+    const submitBtn = document.getElementById('submitBtn');
+    const apiKey = "[[${apiKey}]]";
+
+    let timerInterval;
+    let isAuthenticated = false;
+
+    authBtn.addEventListener('click', function(event) {
+      event.preventDefault();
+      const email = emailInput.value.trim();
+      const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
+      if (!emailRegex.test(email)) {
+        alert('유효한 이메일을 입력해주세요. (예: example@gmail.com)');
+        return;
+      }
+
+      let timeLeft = 300; // 5분
+      const updateTimer = () => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        timeLeft--;
+
+        if (timeLeft < 0) {
+          clearInterval(timerInterval);
+          alert("시간이 초과되었습니다. 다시 인증번호를 받아주세요.")
+          authBtn.disabled = false;
+          timerContainer.style.display = 'none';
+          codeContainer.style.display = 'none';
+        }
+      };
+
+      timerInterval = setInterval(updateTimer, 1000);
+      updateTimer();
+
+      fetch(`http://localhost:8888/api/user/code?email=${email}`, {
+        method: 'POST',
+        headers: {
+          'x-api-key' : apiKey
+        }
+      })
+      .then(response => {
+        return response.json();
+      }).then(data => {
+        console.log(data);
+        if (data.code == "00") {
+          alert('이메일로 인증번호를 발송하였습니다.');
+          authBtn.disabled = true;
+          timerContainer.style.display = 'inline';
+          codeContainer.style.display = 'flex';
+        } else {
+          console.log(data.data);
+          alert(data.data.msg);
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    });
+
+    verifyBtn.addEventListener('click', function(event) {
+      event.preventDefault();
+      authBtn.disabled = true; // 인증 버튼 비활성화
+      const email = emailInput.value.trim();
+      const code = codeInput.value.trim();
+
+      fetch(`http://localhost:8888/api/user/authentication?email=${email}&code=${code}`, {
+        method: 'POST',
+        headers: {
+          'x-api-key' : apiKey
+        }
+      })
+      .then(response => {
+        return response.json();
+      }).then(data => {
+        console.log(data);
+        if (data.code == "00") {
+          alert('인증되었습니다.');
+          isAuthenticated = true;
+          clearInterval(timerInterval);
+          authBtn.disabled = true;
+          timerContainer.style.display = 'none';
+          codeContainer.style.display = 'none';
+          formContainer.style.display = 'block';
+          submitBtn.style.display = 'block';
+        } else {
+          console.log(data.data)
+          alert(data.data.msg)
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    });
+
+    submitBtn.addEventListener('click', function(event) {
+      const email = emailInput.value.trim();
+
+      if (!isAuthenticated) {
+        alert('먼저 인증을 완료해야 합니다.');
+        return;
+      }
+
+      const confirmation = confirm('정말 서비스 이용을 중지하시겠습니까?');
+      if (confirmation) {
+        fetch(`http://localhost:8888/api/user?email=${email}`, {
+          method: 'DELETE',
+          headers: {
+            'x-api-key' : apiKey
+          }
+        })
+        .then(response => {
+          return response.json();
+        }).then(data => {
+          if (data.code == "00") {
+            alert(data.data);
+            window.location.href = 'http://localhost:8888';
+          } else {
+            alert(data.data.msg);
+          }
+        })
+        .catch(error => {
+          console.error(error);
+        });
+      }
+    });
+
+    document.body.addEventListener('click', function(e) {
+      if (!e.target.closest('form')) {
+        const drop = document.createElement('div');
+        drop.className = 'drop';
+        drop.style.width = '60px';
+        drop.style.height = '60px';
+        drop.style.left = `${e.clientX - 30}px`;
+        drop.style.top = `${e.clientY - 30}px`;
+        document.body.appendChild(drop);
+        setTimeout(() => {
+          drop.remove();
+        }, 600);
+      }
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Top Feed</title>
+  <link rel="icon" href="https://velog.velcdn.com/images/hyuntae99/post/a526a2a6-049f-44d9-a3a5-283ab944719b/image.png" type="image/png">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #e0f7fa;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+      color: #333;
+      overflow: hidden; /* 물방울이 화면 밖으로 나가지 않도록 */
+    }
+    .header {
+      margin: 20px 0;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 2em;
+      margin: 0;
+      color: #00796b;
+    }
+    .header p {
+      font-size: 1.2em;
+      margin: 5px 0;
+      color: #004d40;
+    }
+    .container {
+      width: 80%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background-color: #ffffff;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      padding: 20px;
+      position: relative;
+    }
+    .toggle-container {
+      margin: 20px 0;
+    }
+    .toggle-header {
+      cursor: pointer;
+      padding: 15px;
+      background: linear-gradient(45deg, #80cbc4, #4db6ac);
+      border: none;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-weight: bold;
+      color: #fff;
+    }
+    .toggle-header:hover {
+      background: linear-gradient(45deg, #4db6ac, #80cbc4);
+    }
+    .toggle-content {
+      display: none;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #fafafa;
+    }
+    .feed-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .feed-item a {
+      text-decoration: none;
+      color: #007BFF;
+    }
+    .feed-item a:hover {
+      text-decoration: underline;
+    }
+    .feed-date {
+      font-size: 0.9em;
+      color: #666;
+      position: absolute;
+      top: 10px;
+      right: 20px;
+    }
+    .notification-buttons {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: row;
+    }
+    .notification-buttons button {
+      margin: 0 5px;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .notification-buttons button:first-child {
+      background-color: #007BFF;
+    }
+    .notification-buttons button:first-child:hover {
+      background-color: #0056b3;
+    }
+    .notification-buttons button:last-child {
+      background-color: #FF5722;
+    }
+    .notification-buttons button:last-child:hover {
+      background-color: #E64A19;
+    }
+    .drop {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(0, 150, 136, 0.5);
+      transform: scale(0);
+      animation: drop 0.6s linear;
+      pointer-events: none;
+    }
+    @keyframes drop {
+      to {
+        transform: scale(1);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>국내 Top4 커뮤니티 사이트의 핫게시글을 소개합니다.</h1>
+  <p>오전 9시부터 오후 9시까지 1시간 간격으로 업데이트됩니다.</p>
+</div>
+
+<div class="container">
+  <div class="feed-date" id="feed-date"></div> <!-- Date를 표시할 위치 -->
+  <div class="toggle-container">
+    <div class="toggle-header" data-source="dcinside">디시인사이드</div>
+    <div class="toggle-content" id="dcinside"></div>
+  </div>
+  <div class="toggle-container">
+    <div class="toggle-header" data-source="fmkorea">에펨코리아</div>
+    <div class="toggle-content" id="fmkorea"></div>
+  </div>
+  <div class="toggle-container">
+    <div class="toggle-header" data-source="nate">네이트판</div>
+    <div class="toggle-content" id="nate"></div>
+  </div>
+  <div class="toggle-container">
+    <div class="toggle-header" data-source="theqoo">더쿠</div>
+    <div class="toggle-content" id="theqoo"></div>
+  </div>
+</div>
+
+<div class="notification-buttons">
+  <button onclick="window.location.href='/register'">알림 설정</button>
+  <button onclick="window.location.href='/withdraw'">알림 해제</button>
+</div>
+
+<script>
+  const apiKey = "[[${apiKey}]]";
+  const feedData = {};
+
+  document.querySelectorAll('.toggle-header').forEach(header => {
+    header.addEventListener('click', function() {
+      const content = this.nextElementSibling;
+      const source = this.getAttribute('data-source');
+      if (content.style.display === 'block') {
+        content.style.display = 'none';
+      } else {
+        if (!feedData[source]) {
+          fetchFeeds(source, content);
+        } else {
+          displayFeeds(source, content);
+        }
+        content.style.display = 'block';
+      }
+    });
+  });
+
+  function fetchFeeds(source, content) {
+    fetch(`http://localhost:8888/api/feed?community=${source}`, {
+      headers: {
+        'x-api-key': apiKey
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Fetched data:', data); // 응답 데이터 콘솔 출력
+      if (data && data.data) {
+        // 첫 번째 항목의 date를 가져와서 표시
+        if (data.data.length > 0) {
+          document.getElementById('feed-date').textContent = data.data[0].date;
+        }
+        feedData[source] = data.data.filter(feed => feed.community === source);
+        displayFeeds(source, content);
+      } else {
+        content.innerHTML = '피드를 불러오는데 실패했습니다.';
+      }
+    })
+    .catch(error => {
+      console.error('피드 불러오기 에러:', error);
+      content.innerHTML = '피드를 불러오는 중 오류가 발생했습니다.';
+    });
+  }
+
+  function displayFeeds(source, content) {
+    content.innerHTML = '';
+    feedData[source].forEach(feed => {
+      const itemElement = document.createElement('div');
+      itemElement.className = 'feed-item';
+      itemElement.innerHTML = `<a href="${feed.link}" target="_blank">${feed.title}</a>`;
+      content.appendChild(itemElement);
+    });
+  }
+
+  document.body.addEventListener('click', function(e) {
+    if (!e.target.closest('.container') && !e.target.closest('.notification-buttons')) {
+      const drop = document.createElement('div');
+      drop.className = 'drop';
+      drop.style.width = '60px';
+      drop.style.height = '60px';
+      drop.style.left = `${e.clientX - 30}px`;
+      drop.style.top = `${e.clientY - 30}px`;
+      document.body.appendChild(drop);
+      setTimeout(() => {
+        drop.remove();
+      }, 600);
+    }
+  });
+</script>
+
+</body>
+</html>
