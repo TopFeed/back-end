@@ -13,6 +13,6 @@ public interface FeedJpaRepository extends JpaRepository<Feed, Long> {
 
   @Modifying
   @Transactional
-  @Query(value = "TRUNCATE TABLE feed", nativeQuery = true)
-  void truncateFeedTable();
+  @Query(value = "DELETE FROM feed WHERE community = :community", nativeQuery = true)
+  void deleteFeedsByCommunity(String community);
 }
