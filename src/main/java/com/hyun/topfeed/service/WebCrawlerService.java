@@ -45,9 +45,6 @@ public class WebCrawlerService {
     ZonedDateTime dateTime = ZonedDateTime.now(koreaZoneId);
     System.out.println(dateTime.toString());
 
-    // 테이블 초기화
-    feedJpaRepository.truncateFeedTable();
-
     // 각 사이트에 대해서 웹크롤링 실시
     try {
       System.out.println("--- dcinside ---");
@@ -95,6 +92,8 @@ public class WebCrawlerService {
           .userAgent(
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
           .get();
+      feedJpaRepository.deleteFeedsByCommunity("dcinside");
+
       Elements rows = doc.select("tr.ub-content.us-post.thum");
 
       int count = 0;
@@ -123,8 +122,9 @@ public class WebCrawlerService {
     try {
       Document doc = Jsoup.connect(fmkoreaLink)
           .userAgent(
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
           .get();
+      feedJpaRepository.deleteFeedsByCommunity("fmkorea");
 
       Elements elements = doc.select("li.li_best2_pop0.li_best2_hotdeal0");
 
@@ -156,6 +156,7 @@ public class WebCrawlerService {
           .userAgent(
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
           .get();
+      feedJpaRepository.deleteFeedsByCommunity("nate");
 
       Elements elements = doc.select("li");
 
@@ -191,6 +192,7 @@ public class WebCrawlerService {
           .userAgent(
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
           .get();
+      feedJpaRepository.deleteFeedsByCommunity("theqoo");
 
       Elements elements = doc.select("tr");
 

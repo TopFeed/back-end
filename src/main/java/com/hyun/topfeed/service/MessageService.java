@@ -75,10 +75,14 @@ public class MessageService {
     String message = "";
     List<Feed> feeds = feedJpaRepository.findAllByCommunity(community);
     message += "[" + community + "]\n";
-    for (int i = 0; i < 3; i++) {
-      message += feeds.get(i).getTitle() + "\n";
+
+    if (!feeds.isEmpty()) {
+      for (int i = 0; i < Math.min(feeds.size(), 3); i++) {
+        message += feeds.get(i).getTitle() + "\n";
+      }
     }
     message += "\n";
+
     return message;
   }
 
