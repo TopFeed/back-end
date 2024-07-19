@@ -13,7 +13,7 @@ import lombok.ToString;
 @Entity
 @Table(name = "feed")
 @Getter
-@ToString(exclude = "feed_id")
+@ToString(exclude = "feedId")
 @NoArgsConstructor
 public class Feed extends BaseEntity {
 
