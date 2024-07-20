@@ -15,7 +15,6 @@
       flex-direction: column;
       font-family: Arial, sans-serif;
       color: #333;
-      /* overflow: hidden;  물방울이 화면 밖으로 나가지 않도록 */
     }
     .header {
       margin: 20px 0;
@@ -44,6 +43,7 @@
     }
     .toggle-container {
       margin: 20px 0;
+      position: relative;
     }
     .toggle-header {
       cursor: pointer;
@@ -65,6 +65,7 @@
       border: 1px solid #ccc;
       border-radius: 5px;
       background-color: #fafafa;
+      position: relative;
     }
     .feed-item {
       display: flex;
@@ -83,7 +84,7 @@
       font-size: 0.9em;
       color: #666;
       position: absolute;
-      top: 10px;
+      top: 15px;
       right: 20px;
     }
     .notification-buttons {
@@ -138,21 +139,24 @@
 </div>
 
 <div class="container">
-  <div class="feed-date" id="feed-date"></div>
   <div class="toggle-container">
     <div class="toggle-header" data-source="dcinside">디시인사이드</div>
+    <div class="feed-date" id="dcinside-date"></div>
     <div class="toggle-content" id="dcinside"></div>
   </div>
   <div class="toggle-container">
     <div class="toggle-header" data-source="fmkorea">에펨코리아</div>
+    <div class="feed-date" id="fmkorea-date"></div>
     <div class="toggle-content" id="fmkorea"></div>
   </div>
   <div class="toggle-container">
     <div class="toggle-header" data-source="nate">네이트판</div>
+    <div class="feed-date" id="nate-date"></div>
     <div class="toggle-content" id="nate"></div>
   </div>
   <div class="toggle-container">
     <div class="toggle-header" data-source="theqoo">더쿠</div>
+    <div class="feed-date" id="theqoo-date"></div>
     <div class="toggle-content" id="theqoo"></div>
   </div>
 </div>
@@ -168,23 +172,26 @@
 
   document.querySelectorAll('.toggle-header').forEach(header => {
     header.addEventListener('click', function() {
-      const content = this.nextElementSibling;
+      const content = this.nextElementSibling.nextElementSibling;
+      const dateElement = this.nextElementSibling;
       const source = this.getAttribute('data-source');
       if (content.style.display === 'block') {
         content.style.display = 'none';
+        dateElement.style.display = 'none';
       } else {
         if (!feedData[source]) {
-          fetchFeeds(source, content);
+          fetchFeeds(source, content, dateElement);
         } else {
-          displayFeeds(source, content);
+          displayFeeds(source, content, dateElement);
         }
         content.style.display = 'block';
+        dateElement.style.display = 'block';
       }
     });
   });
 
-  function fetchFeeds(source, content) {
-    fetch(`https://topfeed.hyunn.site/api/feed?community=${source}`, {
+  function fetchFeeds(source, content, dateElement) {
+    fetch(`http://localhost:8888/api/feed?community=${source}`, {
       headers: {
         'x-api-key': apiKey
       }
@@ -193,9 +200,11 @@
     .then(data => {
       console.log('Fetched data:', data); // 응답 데이터 콘솔 출력
       if (data && data.data) {
+        console.log(`Date for ${source}:`, data.data[0].date); // Date 로그 출력
         // 첫 번째 항목의 date를 가져와서 표시
         if (data.data.length > 0) {
-          document.getElementById('feed-date').textContent = data.data[0].date;
+          const formattedDate = formatDate(data.data[0].date);
+          dateElement.textContent = formattedDate;
         }
         feedData[source] = data.data.filter(feed => feed.community === source);
         displayFeeds(source, content);
@@ -217,6 +226,11 @@
       itemElement.innerHTML = `<a href="${feed.link}" target="_blank">${feed.title}</a>`;
       content.appendChild(itemElement);
     });
+  }
+
+  function formatDate(dateString) {
+    // 받아온 날짜 문자열 그대로 반환
+    return dateString.replace('T', ' ').replace('Z', '');
   }
 
   document.body.addEventListener('click', function(e) {
