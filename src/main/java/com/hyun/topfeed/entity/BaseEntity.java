@@ -1,9 +1,6 @@
 package com.hyun.topfeed.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import lombok.Getter;
@@ -15,15 +12,15 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @MappedSuperclass
 public abstract class BaseEntity {
 
-  // 수정 시간
+  // 최근 수정 시간
   @LastModifiedDate
   @Column(name = "date", nullable = false)
-  private LocalDateTime date;
+  private ZonedDateTime date;
 
   BaseEntity() {
     // 한국 시간으로 설정
     ZoneId koreaZoneId = ZoneId.of("Asia/Seoul");
-    date = ZonedDateTime.now(koreaZoneId).toLocalDateTime();
+    date = ZonedDateTime.now(koreaZoneId);
   }
 
 }
