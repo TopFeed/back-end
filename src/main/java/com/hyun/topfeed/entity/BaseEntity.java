@@ -21,9 +21,8 @@ public abstract class BaseEntity {
   private LocalDateTime date;
 
   BaseEntity() {
-    // 한국 시간으로 설정
+    // 한국 시간으로 설정하기 위해서 9시간 더함
     ZoneId koreaZoneId = ZoneId.of("Asia/Seoul");
-    date = ZonedDateTime.now(koreaZoneId).toLocalDateTime();
+    date = ZonedDateTime.now(koreaZoneId).plusHours(9).toLocalDateTime();
   }
-
 }
