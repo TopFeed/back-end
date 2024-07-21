@@ -96,7 +96,7 @@
 <img src="https://velog.velcdn.com/images/hyuntae99/post/52b5762e-78d9-44e1-8ebf-2baad1d55985/image.png" height=150 width=350>
 
 아래 처럼 핫게시글을 이메일로 보냅니다. <br>
-<img src="https://velog.velcdn.com/images/hyuntae99/post/1e47be9b-7e5e-44cb-a439-7f731c5515fb/image.png" height=350 width=300>
+<img src="https://velog.velcdn.com/images/hyuntae99/post/d977ef15-471f-45e8-9078-9f8c768a17a8/image.png" height=350 width=300>
 <br><br>
 
 ## 3. 이메일 알림 서비스 해지
