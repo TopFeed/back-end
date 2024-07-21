@@ -55,7 +55,7 @@ public class MessageService {
    * 메세지 발송에 대한 응답 취합
    */
   public void sendMessage(String email) {
-    List<String> communityList = List.of(new String[]{"dcinside", "ruliweb", "nate", "theqoo"});
+    List<String> communityList = List.of(new String[]{"dcinside", "nate", "theqoo"});
 
     // 메세지 만들기
     String message = "";

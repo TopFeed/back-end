@@ -29,9 +29,6 @@ public class WebCrawlerService {
   @Value("${community.dcinside}")
   private String dcinsideLink;
 
-  @Value("${community.ruliweb}")
-  private String ruliwebLink;
-
   @Value("${community.nate}")
   private String nateLink;
 
@@ -55,9 +52,10 @@ public class WebCrawlerService {
   public void init() {
     // 애플리케이션 시작 시 즉시 실행
     crawler();
+    sendEmails();
   }
 
-  @Scheduled(cron = "0 0 9-21/6 * * *", zone = "Asia/Seoul") // 오전 9시부터 오후 9시까지 6시간 간격으로 실행
+  @Scheduled(cron = "0 0 9-21/3 * * *", zone = "Asia/Seoul") // 오전 9시부터 오후 9시까지 3시간 간격으로 실행
   public void crawler() {
     ZoneId koreaZoneId = ZoneId.of("Asia/Seoul"); // 대한민국 시간대
     ZonedDateTime dateTime = ZonedDateTime.now(koreaZoneId);
@@ -67,12 +65,6 @@ public class WebCrawlerService {
     try {
       System.out.println("--- dcinside ---");
       crawlWebsite_dcinside();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    try {
-      System.out.println("--- ruliweb ---");
-      crawlWebsite_ruliweb();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -88,7 +80,10 @@ public class WebCrawlerService {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
 
+  @Scheduled(cron = "0 10 9,21 * * *", zone = "Asia/Seoul") // 오전 오후 9시 10분에 실행
+  public void sendEmails() {
     // 서비스 설정을 완료한 유저들에게 메세지 전송
     List<User> users = userJpaRepository.findAllByStatusTrue();
     if (!users.isEmpty()) {
@@ -101,12 +96,8 @@ public class WebCrawlerService {
 
   @Transactional
   public void crawlWebsite_dcinside() throws IOException {
-    tryWithUserAgents(dcinsideLink, "dcinside", "tr.ub-content.us-post.thum", "td.gall_tit.ub-word a", "https://gall.dcinside.com");
-  }
-
-  @Transactional
-  public void crawlWebsite_ruliweb() throws IOException {
-    tryWithUserAgents(ruliwebLink, "ruliweb", "div.title.row", "a.subject_link.deco", "");
+    tryWithUserAgents(dcinsideLink, "dcinside", "tr.ub-content.us-post.thum",
+        "td.gall_tit.ub-word a", "https://gall.dcinside.com");
   }
 
   @Transactional
@@ -119,7 +110,8 @@ public class WebCrawlerService {
     tryWithUserAgents(theqooLink, "theqoo", "tr:not(.notice)", "td.title a", "https://theqoo.net");
   }
 
-  private void tryWithUserAgents(String url, String community, String rowSelector, String titleSelector, String baseUrl) {
+  private void tryWithUserAgents(String url, String community, String rowSelector,
+      String titleSelector, String baseUrl) {
     for (String userAgent : USER_AGENTS) {
       if (tryWithUserAgent(url, community, rowSelector, titleSelector, baseUrl, userAgent)) {
         break;
@@ -132,7 +124,8 @@ public class WebCrawlerService {
     }
   }
 
-  private boolean tryWithUserAgent(String url, String community, String rowSelector, String titleSelector, String baseUrl, String userAgent) {
+  private boolean tryWithUserAgent(String url, String community, String rowSelector,
+      String titleSelector, String baseUrl, String userAgent) {
     try {
       Connection connection = Jsoup.connect(url)
           .userAgent(userAgent)
