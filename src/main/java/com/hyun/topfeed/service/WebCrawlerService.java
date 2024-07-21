@@ -29,9 +29,6 @@ public class WebCrawlerService {
   @Value("${community.dcinside}")
   private String dcinsideLink;
 
-  @Value("${community.ruliweb}")
-  private String ruliwebLink;
-
   @Value("${community.nate}")
   private String nateLink;
 
@@ -71,12 +68,6 @@ public class WebCrawlerService {
       e.printStackTrace();
     }
     try {
-      System.out.println("--- ruliweb ---");
-      crawlWebsite_ruliweb();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    try {
       System.out.println("--- nate ---");
       crawlWebsite_nate();
     } catch (IOException e) {
@@ -101,12 +92,8 @@ public class WebCrawlerService {
 
   @Transactional
   public void crawlWebsite_dcinside() throws IOException {
-    tryWithUserAgents(dcinsideLink, "dcinside", "tr.ub-content.us-post.thum", "td.gall_tit.ub-word a", "https://gall.dcinside.com");
-  }
-
-  @Transactional
-  public void crawlWebsite_ruliweb() throws IOException {
-    tryWithUserAgents(ruliwebLink, "ruliweb", "div.title.row", "a.subject_link.deco", "");
+    tryWithUserAgents(dcinsideLink, "dcinside", "tr.ub-content.us-post.thum",
+        "td.gall_tit.ub-word a", "https://gall.dcinside.com");
   }
 
   @Transactional
@@ -119,7 +106,8 @@ public class WebCrawlerService {
     tryWithUserAgents(theqooLink, "theqoo", "tr:not(.notice)", "td.title a", "https://theqoo.net");
   }
 
-  private void tryWithUserAgents(String url, String community, String rowSelector, String titleSelector, String baseUrl) {
+  private void tryWithUserAgents(String url, String community, String rowSelector,
+      String titleSelector, String baseUrl) {
     for (String userAgent : USER_AGENTS) {
       if (tryWithUserAgent(url, community, rowSelector, titleSelector, baseUrl, userAgent)) {
         break;
@@ -132,7 +120,8 @@ public class WebCrawlerService {
     }
   }
 
-  private boolean tryWithUserAgent(String url, String community, String rowSelector, String titleSelector, String baseUrl, String userAgent) {
+  private boolean tryWithUserAgent(String url, String community, String rowSelector,
+      String titleSelector, String baseUrl, String userAgent) {
     try {
       Connection connection = Jsoup.connect(url)
           .userAgent(userAgent)
