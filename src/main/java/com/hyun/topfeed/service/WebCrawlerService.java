@@ -125,7 +125,7 @@ public class WebCrawlerService {
         break;
       }
       try {
-        Thread.sleep(3000);
+        Thread.sleep(1000);
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
       }
@@ -139,7 +139,7 @@ public class WebCrawlerService {
           .header("Accept", "text/html")
           .header("Accept-Encoding", "gzip, deflate")
           .header("Connection", "keep-alive")
-          .timeout(10000)
+          .timeout(30000)
           .maxBodySize(0)
           .followRedirects(true);
       Document doc = connection.get();
