@@ -95,7 +95,7 @@
 아래와 같이 이메일로 인증번호를 전송합니다.<br>
 <img src="https://velog.velcdn.com/images/hyuntae99/post/52b5762e-78d9-44e1-8ebf-2baad1d55985/image.png" height=150 width=350>
 
-아래 처럼 핫게시글을 이메일로 보냅니다.
+아래 처럼 핫게시글을 이메일로 보냅니다. <br>
 <img src="https://velog.velcdn.com/images/hyuntae99/post/1e47be9b-7e5e-44cb-a439-7f731c5515fb/image.png" height=350 width=300>
 <br><br>
 
