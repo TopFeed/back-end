@@ -3,6 +3,8 @@ package com.hyun.topfeed.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -20,9 +22,10 @@ public abstract class BaseEntity {
   @Column(name = "date", nullable = false)
   private LocalDateTime date;
 
-  BaseEntity() {
-    // 한국 시간으로 설정하기 위해서 9시간 더함
+  @PrePersist
+  @PreUpdate
+  protected void onUpdate() {
     ZoneId koreaZoneId = ZoneId.of("Asia/Seoul");
-    date = ZonedDateTime.now(koreaZoneId).plusHours(9).toLocalDateTime();
+    this.date = ZonedDateTime.now(koreaZoneId).toLocalDateTime();
   }
 }
