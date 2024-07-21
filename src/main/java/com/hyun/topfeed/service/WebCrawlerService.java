@@ -11,6 +11,7 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -128,13 +129,15 @@ public class WebCrawlerService {
 
   private boolean tryWithUserAgent(String url, String community, String rowSelector, String titleSelector, String baseUrl, String userAgent) {
     try {
-      Document doc = Jsoup.connect(url)
+      Connection connection = Jsoup.connect(url)
           .userAgent(userAgent)
           .header("Accept", "text/html")
           .header("Accept-Encoding", "gzip, deflate")
           .header("Connection", "keep-alive")
           .timeout(10000)
-          .get();
+          .maxBodySize(0)
+          .followRedirects(true);
+      Document doc = connection.get();
       feedJpaRepository.deleteFeedsByCommunity(community);
       System.out.println(community + " db 초기화");
 
