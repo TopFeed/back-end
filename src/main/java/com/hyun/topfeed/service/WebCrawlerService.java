@@ -29,8 +29,8 @@ public class WebCrawlerService {
   @Value("${community.dcinside}")
   private String dcinsideLink;
 
-  @Value("${community.clien}")
-  private String clienLink;
+  @Value("${community.ruliweb}")
+  private String ruliwebLink;
 
   @Value("${community.nate}")
   private String nateLink;
@@ -44,10 +44,10 @@ public class WebCrawlerService {
 
   private static final List<String> USER_AGENTS = Arrays.asList(
       "Lynx/2.9.0dev.5 libwww-FM/2.14",
-      "Lynx/2.8.8dev.3 libwww-FM/2.14 SSL-MM/1.4.1",
-      "Lynx/2.8.7rel.2 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/1.0.0a",
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+      "Lynx/2.8.8dev.3 libwww-FM/2.14 SSL-MM/1.4.1",
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+      "Lynx/2.8.7rel.2 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/1.0.0a",
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0"
   );
 
@@ -71,8 +71,8 @@ public class WebCrawlerService {
       e.printStackTrace();
     }
     try {
-      System.out.println("--- clien ---");
-      crawlWebsite_clien();
+      System.out.println("--- ruliweb ---");
+      crawlWebsite_ruliweb();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -105,8 +105,8 @@ public class WebCrawlerService {
   }
 
   @Transactional
-  public void crawlWebsite_clien() throws IOException {
-    tryWithUserAgents(clienLink, "clien", "div.list_item.symph_row", "a.list_subject", "https://www.clien.net");
+  public void crawlWebsite_ruliweb() throws IOException {
+    tryWithUserAgents(ruliwebLink, "ruliweb", "div.title.row", "a.subject_link.deco", "");
   }
 
   @Transactional
@@ -123,6 +123,11 @@ public class WebCrawlerService {
     for (String userAgent : USER_AGENTS) {
       if (tryWithUserAgent(url, community, rowSelector, titleSelector, baseUrl, userAgent)) {
         break;
+      }
+      try {
+        Thread.sleep(3000);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
       }
     }
   }
