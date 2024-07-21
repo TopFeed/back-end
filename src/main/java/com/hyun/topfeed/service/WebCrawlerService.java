@@ -52,9 +52,10 @@ public class WebCrawlerService {
   public void init() {
     // 애플리케이션 시작 시 즉시 실행
     crawler();
+    sendEmails();
   }
 
-  @Scheduled(cron = "0 0 9-21/6 * * *", zone = "Asia/Seoul") // 오전 9시부터 오후 9시까지 6시간 간격으로 실행
+  @Scheduled(cron = "0 0 9-21/3 * * *", zone = "Asia/Seoul") // 오전 9시부터 오후 9시까지 3시간 간격으로 실행
   public void crawler() {
     ZoneId koreaZoneId = ZoneId.of("Asia/Seoul"); // 대한민국 시간대
     ZonedDateTime dateTime = ZonedDateTime.now(koreaZoneId);
@@ -79,7 +80,10 @@ public class WebCrawlerService {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
 
+  @Scheduled(cron = "0 10 9,21 * * *", zone = "Asia/Seoul") // 오전 오후 9시 10분에 실행
+  public void sendEmails() {
     // 서비스 설정을 완료한 유저들에게 메세지 전송
     List<User> users = userJpaRepository.findAllByStatusTrue();
     if (!users.isEmpty()) {
