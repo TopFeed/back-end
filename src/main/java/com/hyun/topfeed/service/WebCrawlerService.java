@@ -114,6 +114,7 @@ public class WebCrawlerService {
           .timeout(10000)
           .get();
       feedJpaRepository.deleteFeedsByCommunity("dcinside");
+      System.out.println("db 초기화");
 
       Elements rows = doc.select("tr.ub-content.us-post.thum");
 
@@ -135,6 +136,7 @@ public class WebCrawlerService {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    System.out.println("크롤링 완료");
   }
 
   /**
@@ -149,6 +151,7 @@ public class WebCrawlerService {
           .timeout(10000)
           .get();
       feedJpaRepository.deleteFeedsByCommunity("fmkorea");
+      System.out.println("db 초기화");
 
       Elements elements = doc.select("li.li_best2_pop0.li_best2_hotdeal0");
 
@@ -170,6 +173,7 @@ public class WebCrawlerService {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    System.out.println("크롤링 완료");
   }
 
   /**
@@ -184,6 +188,7 @@ public class WebCrawlerService {
           .timeout(10000)
           .get();
       feedJpaRepository.deleteFeedsByCommunity("nate");
+      System.out.println("db 초기화");
 
       Elements elements = doc.select("li");
 
@@ -209,6 +214,7 @@ public class WebCrawlerService {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    System.out.println("크롤링 완료");
   }
 
   /**
@@ -223,6 +229,7 @@ public class WebCrawlerService {
           .timeout(10000)
           .get();
       feedJpaRepository.deleteFeedsByCommunity("theqoo");
+      System.out.println("db 초기화");
 
       Elements elements = doc.select("tr");
 
@@ -250,5 +257,6 @@ public class WebCrawlerService {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    System.out.println("크롤링 완료");
   }
 }
