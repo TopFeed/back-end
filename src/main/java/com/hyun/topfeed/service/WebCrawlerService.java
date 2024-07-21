@@ -28,8 +28,8 @@ public class WebCrawlerService {
   @Value("${community.dcinside}")
   private String dcinsideLink;
 
-  @Value("${community.fmkorea}")
-  private String fmkoreaLink;
+  @Value("${community.clien}")
+  private String clienLink;
 
   @Value("${community.nate}")
   private String nateLink;
@@ -56,7 +56,7 @@ public class WebCrawlerService {
     crawler();
   }
 
-  @Scheduled(cron = "0 0 9-21/3 * * *", zone = "Asia/Seoul") // 오전 9시부터 오후 9시까지 3시간 간격으로 실행
+  @Scheduled(cron = "0 0 9-21/6 * * *", zone = "Asia/Seoul") // 오전 9시부터 오후 9시까지 6시간 간격으로 실행
   public void crawler() {
     ZoneId koreaZoneId = ZoneId.of("Asia/Seoul"); // 대한민국 시간대
     ZonedDateTime dateTime = ZonedDateTime.now(koreaZoneId);
@@ -70,8 +70,8 @@ public class WebCrawlerService {
       e.printStackTrace();
     }
     try {
-      System.out.println("--- fmkorea ---");
-      crawlWebsite_fmkorea();
+      System.out.println("--- clien ---");
+      crawlWebsite_clien();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -104,8 +104,8 @@ public class WebCrawlerService {
   }
 
   @Transactional
-  public void crawlWebsite_fmkorea() throws IOException {
-    tryWithUserAgents(fmkoreaLink, "fmkorea", "li.li_best2_pop0.li_best2_hotdeal0", "h3.title a.hotdeal_var8", "https://www.fmkorea.com");
+  public void crawlWebsite_clien() throws IOException {
+    tryWithUserAgents(clienLink, "clien", "div.list_item.symph_row", "a.list_subject", "https://www.clien.net");
   }
 
   @Transactional
