@@ -4,6 +4,7 @@ import com.hyun.topfeed.entity.Feed;
 import com.hyun.topfeed.entity.User;
 import com.hyun.topfeed.repository.FeedJpaRepository;
 import com.hyun.topfeed.repository.UserJpaRepository;
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -42,22 +43,21 @@ public class WebCrawlerService {
   private final MessageService messageService;
 
   private static final List<String> USER_AGENTS = Arrays.asList(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0",
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0 Unique/97.7.7239.70",
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-      "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36",
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Agency/98.8.8175.80",
-      "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36",
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0",
-      "Mozilla/5.0 (Android 8.1.0; Mobile; rv:123.0) Gecko/123.0 Firefox/123.0",
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0"
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0"
   );
 
   private static final Random RANDOM = new Random();
 
   private String getRandomUserAgent() {
     return USER_AGENTS.get(RANDOM.nextInt(USER_AGENTS.size()));
+  }
+
+  @PostConstruct
+  public void init() {
+    // 애플리케이션 시작 시 즉시 실행
+    crawler();
   }
 
   @Scheduled(cron = "0 0 9-21/3 * * *", zone = "Asia/Seoul") // 오전 9시부터 오후 9시까지 3시간 간격으로 실행
@@ -111,9 +111,10 @@ public class WebCrawlerService {
     try {
       Document doc = Jsoup.connect(dcinsideLink)
           .userAgent(getRandomUserAgent())
-          .timeout(5000)
+          .timeout(10000)
           .get();
       feedJpaRepository.deleteFeedsByCommunity("dcinside");
+      System.out.println("db 초기화");
 
       Elements rows = doc.select("tr.ub-content.us-post.thum");
 
@@ -135,6 +136,7 @@ public class WebCrawlerService {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    System.out.println("크롤링 완료");
   }
 
   /**
@@ -146,9 +148,10 @@ public class WebCrawlerService {
     try {
       Document doc = Jsoup.connect(fmkoreaLink)
           .userAgent(getRandomUserAgent())
-          .timeout(5000)
+          .timeout(10000)
           .get();
       feedJpaRepository.deleteFeedsByCommunity("fmkorea");
+      System.out.println("db 초기화");
 
       Elements elements = doc.select("li.li_best2_pop0.li_best2_hotdeal0");
 
@@ -170,6 +173,7 @@ public class WebCrawlerService {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    System.out.println("크롤링 완료");
   }
 
   /**
@@ -181,9 +185,10 @@ public class WebCrawlerService {
     try {
       Document doc = Jsoup.connect(nateLink)
           .userAgent(getRandomUserAgent())
-          .timeout(5000)
+          .timeout(10000)
           .get();
       feedJpaRepository.deleteFeedsByCommunity("nate");
+      System.out.println("db 초기화");
 
       Elements elements = doc.select("li");
 
@@ -209,6 +214,7 @@ public class WebCrawlerService {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    System.out.println("크롤링 완료");
   }
 
   /**
@@ -220,9 +226,10 @@ public class WebCrawlerService {
     try {
       Document doc = Jsoup.connect(theqooLink)
           .userAgent(getRandomUserAgent())
-          .timeout(5000)
+          .timeout(10000)
           .get();
       feedJpaRepository.deleteFeedsByCommunity("theqoo");
+      System.out.println("db 초기화");
 
       Elements elements = doc.select("tr");
 
@@ -250,5 +257,6 @@ public class WebCrawlerService {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    System.out.println("크롤링 완료");
   }
 }

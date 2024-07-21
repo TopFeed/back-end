@@ -27,7 +27,6 @@ public class FeedController {
       @RequestHeader(value = "x-api-key", required = false) String apiKey,
       @RequestParam("community") String community) {
     List<Feed> feeds = feedService.showFeedByCommunity(community, apiKey);
-    System.out.println(community);
     return ResponseEntity.ok(ApiStandardResponse.success(feeds));
   }
 }
